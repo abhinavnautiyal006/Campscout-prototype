@@ -4,10 +4,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CampScout | Your Campus, Your Guide</title>
+<meta name="theme-color" content="#0b1220">
+<title>CampScout | IIT Roorkee</title>
+<meta name="description" content="Explore IIT Roorkee with CampScout campus maps, building information and nearby places.">
 
-<link rel="stylesheet"
- href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
 :root {
@@ -27,7 +28,7 @@ body {
   color: var(--text);
 }
 header {
-  padding: 20px;
+  padding: 18px;
   background: #101a2a;
   border-bottom: 1px solid var(--border);
   display: flex;
@@ -36,34 +37,14 @@ header {
   gap: 12px;
   flex-wrap: wrap;
 }
-.brand { font-size: 24px; font-weight: 800; }
+.brand { font-size: 25px; font-weight: 800; }
 .brand span { color: var(--green); }
 header p { color: var(--muted); margin: 4px 0 0; }
-main {
-  max-width: 1250px;
-  margin: auto;
-  padding: 18px;
-}
-.searchbar {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-input, select, button {
-  font: inherit;
-  border-radius: 9px;
-  padding: 11px;
-}
-input, select {
-  background: var(--panel);
-  color: var(--text);
-  border: 1px solid var(--border);
-  min-width: 0;
-}
-#search { flex: 1; }
+main { max-width: 1250px; margin: auto; padding: 18px; }
+button, input, select { font: inherit; border-radius: 9px; padding: 11px; }
 button {
   cursor: pointer;
-  border: 0;
+  border: none;
   background: var(--green);
   color: #062419;
   font-weight: 700;
@@ -72,6 +53,15 @@ button.secondary {
   background: #263750;
   color: white;
 }
+button:hover { filter: brightness(1.1); }
+input, select {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+input { min-width: 0; }
+.searchbar { display: flex; gap: 8px; margin-bottom: 16px; }
+#search { flex: 1; }
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
@@ -90,10 +80,10 @@ button.secondary {
   margin: 0;
   border-bottom: 1px solid var(--border);
 }
-#map { height: 430px; width: 100%; }
 .content { padding: 15px; }
 .muted { color: var(--muted); }
-.tags { display: flex; gap: 8px; flex-wrap: wrap; }
+#map { height: 430px; width: 100%; }
+.tags { display: flex; gap: 7px; flex-wrap: wrap; margin: 10px 0; }
 .tag {
   background: #203a43;
   color: #85f2c4;
@@ -101,11 +91,8 @@ button.secondary {
   padding: 5px 10px;
   font-size: 12px;
 }
-.place {
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-}
-.place:last-child { border: 0; }
+.place { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.place:last-child { border-bottom: 0; }
 .place h3 { margin: 0 0 5px; font-size: 15px; }
 .place p { margin: 4px 0; color: var(--muted); font-size: 13px; }
 .place button { margin-top: 7px; }
@@ -116,13 +103,12 @@ button.secondary {
   margin-top: 12px;
 }
 .room {
-  min-height: 66px;
-  border: 1px solid #547394;
-  border-radius: 8px;
+  min-height: 65px;
   background: #1a3049;
   color: white;
+  border: 1px solid #547394;
 }
-.room:hover, .room.active { background: #17664f; }
+.room.active, .room:hover { background: #17664f; }
 #roomInfo {
   margin-top: 12px;
   padding: 12px;
@@ -130,6 +116,8 @@ button.secondary {
   border-radius: 8px;
   color: var(--muted);
 }
+.official-link { color: #22c987; }
+.notice { font-size: 12px; color: var(--muted); line-height: 1.6; }
 footer {
   text-align: center;
   color: var(--muted);
@@ -137,7 +125,7 @@ footer {
   font-size: 12px;
 }
 .leaflet-popup-content-wrapper { border-radius: 10px; }
-@media (max-width: 760px) {
+@media(max-width:760px) {
   .layout { grid-template-columns: 1fr; }
   #map { height: 340px; }
   main { padding: 12px; }
@@ -149,46 +137,59 @@ footer {
 <header>
   <div>
     <div class="brand">📍 Camp<span>Scout</span></div>
-    <p>Your Campus, Your Guide.</p>
+    <p>IIT Roorkee Campus Explorer</p>
   </div>
-  <button id="locateBtn">◎ Find my location</button>
+  <button id="locateBtn">◎ Find My Location</button>
 </header>
 
 <main>
   <div class="searchbar">
-    <input id="search" placeholder="Search library, canteen, lab...">
+    <input id="search" type="search" placeholder="Search buildings, library, departments...">
     <button id="searchBtn">Search</button>
   </div>
 
   <div class="layout">
     <section>
       <div class="panel">
-        <h2>🗺️ Campus Map</h2>
+        <h2>🗺️ IIT Roorkee Campus Map</h2>
         <div id="map"></div>
         <div class="content muted" id="mapMessage">
-          Select a marker to explore a campus location.
+          Select a map marker to explore a location.
         </div>
       </div>
 
       <div class="panel">
         <h2>🏢 Building Information</h2>
         <div class="content" id="details">
-          <h3>Welcome to CampScout</h3>
+          <h3>Welcome to CampScout!</h3>
           <p class="muted">
-            Select a building on the map or from the nearby places list.
+            Search for campus places or select a marker on the map
+            to view building information.
           </p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>ℹ️ Official Campus Information</h2>
+        <div class="content">
+          <p>Consult the institute's published campus navigation for reference.</p>
+          <a class="official-link"
+             href="https://www.iitr.ac.in/iahr2024/navigation_iitr_campus.html"
+             target="_blank" rel="noopener noreferrer">
+            Open IIT Roorkee Campus Navigation ↗
+          </a>
         </div>
       </div>
     </section>
 
     <aside>
       <div class="panel">
-        <h2>📍 Nearby Places</h2>
+        <h2>📍 Campus Places</h2>
         <div class="content">
-          <label for="category">Filter by category</label>
-          <select id="category" style="width:100%; margin-top:8px">
-            <option value="All">All places</option>
-            <option value="Academic">Academic buildings</option>
+          <label for="category">Filter places</label>
+          <select id="category" style="width:100%;margin-top:8px">
+            <option value="All">All Places</option>
+            <option value="Academic">Academic Buildings</option>
             <option value="Library">Libraries</option>
             <option value="Canteen">Canteens</option>
             <option value="Facility">Facilities</option>
@@ -200,143 +201,293 @@ footer {
       <div class="panel">
         <h2>🧭 Indoor Floor Explorer</h2>
         <div class="content">
-          <label for="floor">Choose floor</label>
-          <select id="floor" style="width:100%; margin-top:8px">
+          <label for="floor">Select floor</label>
+          <select id="floor" style="width:100%;margin-top:8px">
             <option value="Ground Floor">Ground Floor</option>
             <option value="First Floor">First Floor</option>
             <option value="Second Floor">Second Floor</option>
           </select>
-
           <div class="floor" id="floorPlan"></div>
-          <div id="roomInfo">
-            Select a room to view its information.
-          </div>
-          <p class="muted" style="font-size:12px">
-            Demo floor plan. Replace the sample rooms with verified
-            campus floor-plan information.
+          <div id="roomInfo">Select a room to see details.</div>
+          <p class="notice">
+            Demo floor layout only. Replace these sample rooms with
+            verified IIT Roorkee building floor plans.
           </p>
         </div>
       </div>
     </aside>
   </div>
+
+  <p class="notice">
+    Map markers below are approximate illustrative coordinates, not
+    verified building entrances. Verify each location before using
+    CampScout for real navigation. Opening hours and building access
+    must be confirmed with the institute.
+  </p>
 </main>
 
 <footer>
-  CampScout • Built to make campus exploration easier.
-  <br>Demo locations are illustrative, not verified campus data.
+  CampScout © 2026 | IIT Roorkee Campus Explorer
+  <br>Map data © OpenStreetMap contributors
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
-// REPLACE THESE SAMPLE COORDINATES WITH YOUR CAMPUS LOCATIONS.
+// =====================================================
+// IIT ROORKEE CAMPUS DATA
+// IMPORTANT: Coordinates are approximate demo values.
+// Verify them against the official campus map.
+// =====================================================
+
 const buildings = [
   {
-    id: 1, name: "Main Academic Block",
-    category: "Academic", lat: 28.6139, lng: 77.2090,
-    year: "Add verified year", hours: "Add opening hours",
-    departments: ["Computer Science", "Administration"],
-    history: "Add your building's history.",
-    special: "Add useful student tips."
+    id: 1,
+    name: "James Thomason Building (Main Building)",
+    category: "Academic",
+    lat: 29.8644,
+    lng: 77.8964,
+    hours: "Confirm locally",
+    departments: ["Institute Administration"],
+    history: "Historic main building of IIT Roorkee.",
+    special: "A major campus landmark."
   },
   {
-    id: 2, name: "Central Library",
-    category: "Library", lat: 28.6145, lng: 77.2100,
-    year: "Add verified year", hours: "Add opening hours",
+    id: 2,
+    name: "Mahatma Gandhi Central Library",
+    category: "Library",
+    lat: 29.8650,
+    lng: 77.8975,
+    hours: "Check official library timings",
     departments: ["Library Services"],
-    history: "Add library information.",
-    special: "Add quiet study areas."
+    history: "Central library of the institute.",
+    special: "Library resources and study spaces."
   },
   {
-    id: 3, name: "Campus Canteen",
-    category: "Canteen", lat: 28.6133, lng: 77.2102,
-    year: "Not specified", hours: "Confirm locally",
-    departments: ["Food Services"],
-    history: "Add canteen information.",
-    special: "Add menu and student tips."
+    id: 3,
+    name: "Department of Chemical Engineering",
+    category: "Academic",
+    lat: 29.8628,
+    lng: 77.8977,
+    hours: "Confirm locally",
+    departments: ["Chemical Engineering"],
+    history: "Academic department at IIT Roorkee.",
+    special: "Academic offices and laboratory facilities."
   },
   {
-    id: 4, name: "Science Laboratory",
-    category: "Academic", lat: 28.6142, lng: 77.2080,
-    year: "Not specified", hours: "Confirm locally",
-    departments: ["Physics", "Chemistry"],
-    history: "Add laboratory information.",
-    special: "Add lab locations and access guidance."
+    id: 4,
+    name: "Mechanical and Industrial Engineering",
+    category: "Academic",
+    lat: 29.8638,
+    lng: 77.8991,
+    hours: "Confirm locally",
+    departments: ["Mechanical Engineering", "Industrial Engineering"],
+    history: "Academic department at IIT Roorkee.",
+    special: "Department offices and laboratories."
   },
   {
-    id: 5, name: "Student Help Desk",
-    category: "Facility", lat: 28.6129, lng: 77.2088,
-    year: "Not specified", hours: "Confirm locally",
-    departments: ["Student Support"],
-    history: "Add help desk information.",
-    special: "Ask about campus services here."
+    id: 5,
+    name: "APJ Abdul Kalam Block",
+    category: "Academic",
+    lat: 29.8655,
+    lng: 77.8948,
+    hours: "Confirm locally",
+    departments: ["Academic Facilities"],
+    history: "Named campus destination.",
+    special: "Verify the specific destination and entrance."
+  },
+  {
+    id: 6,
+    name: "MAC Auditorium",
+    category: "Facility",
+    lat: 29.8618,
+    lng: 77.8958,
+    hours: "Confirm event timings",
+    departments: ["Events", "Auditorium"],
+    history: "Auditorium destination on campus.",
+    special: "Events and institute gatherings."
+  },
+  {
+    id: 7,
+    name: "Department of Hydro and Renewable Energy",
+    category: "Academic",
+    lat: 29.8627,
+    lng: 77.8952,
+    hours: "Confirm locally",
+    departments: ["Hydro and Renewable Energy"],
+    history: "Academic department at IIT Roorkee.",
+    special: "Hydro and renewable energy studies."
+  },
+  {
+    id: 8,
+    name: "IIT Community Centre",
+    category: "Facility",
+    lat: 29.8670,
+    lng: 77.8980,
+    hours: "Confirm locally",
+    departments: ["Community Facilities"],
+    history: "Community facility listed as a campus destination.",
+    special: "Check access and available services."
+  },
+  {
+    id: 9,
+    name: "N C Nigam Guest House",
+    category: "Facility",
+    lat: 29.8663,
+    lng: 77.8950,
+    hours: "Confirm with guest house",
+    departments: ["Guest Accommodation"],
+    history: "Guest house destination at the institute.",
+    special: "Check booking and visitor access requirements."
+  },
+  {
+    id: 10,
+    name: "Khosla International House",
+    category: "Facility",
+    lat: 29.8622,
+    lng: 77.8938,
+    hours: "Confirm locally",
+    departments: ["Accommodation"],
+    history: "Named campus destination.",
+    special: "Verify the exact location and access information."
   }
 ];
 
-const map = L.map("map").setView([28.6139, 77.2090], 17);
+// =====================================================
+// MAP INITIALIZATION
+// =====================================================
+
+const map = L.map("map").setView([29.8642, 77.8964], 16);
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  attribution:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  maxZoom: 19
 }).addTo(map);
 
+const markers = new Map();
 let userLocation = null;
 let userMarker = null;
-const markers = new Map();
+
+// =====================================================
+// DISTANCE CALCULATION
+// =====================================================
 
 function distanceMeters(a, b) {
   const R = 6371000;
-  const rad = x => x * Math.PI / 180;
+  const rad = value => value * Math.PI / 180;
+
   const dLat = rad(b.lat - a.lat);
   const dLng = rad(b.lng - a.lng);
-  const h = Math.sin(dLat / 2) ** 2 +
-    Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) *
+
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(rad(a.lat)) *
+    Math.cos(rad(b.lat)) *
     Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(h));
+
+  return 2 * R * Math.asin(Math.sqrt(Math.min(1, h)));
 }
 
 function distanceText(place) {
-  if (!userLocation) return "Distance unavailable";
-  const d = distanceMeters(userLocation, place);
-  return d < 1000 ? `${Math.round(d)} m away` :
-    `${(d / 1000).toFixed(2)} km away`;
+  if (!userLocation) return "GPS distance unavailable";
+
+  const distance = distanceMeters(userLocation, place);
+
+  if (distance < 1000) {
+    return Math.round(distance) + " m away";
+  }
+
+  return (distance / 1000).toFixed(2) + " km away";
 }
 
-function showBuilding(b) {
-  document.getElementById("details").innerHTML = `
-    <h3>${b.name}</h3>
-    <div class="tags">
-      <span class="tag">${b.category}</span>
-      <span class="tag">${distanceText(b)}</span>
-    </div>
-    <p><b>Year built:</b> ${b.year}</p>
-    <p><b>Opening hours:</b> ${b.hours}</p>
-    <p><b>Departments/services:</b> ${b.departments.join(", ")}</p>
-    <p><b>History:</b> ${b.history}</p>
-    <p><b>What's special:</b> ${b.special}</p>
-    <button onclick="showRoute(${b.id})">Show on map</button>
-  `;
+// =====================================================
+// BUILDING INFORMATION
+// =====================================================
+
+function showBuilding(building) {
+  const details = document.getElementById("details");
+  details.replaceChildren();
+
+  const title = document.createElement("h3");
+  title.textContent = building.name;
+  details.appendChild(title);
+
+  const tags = document.createElement("div");
+  tags.className = "tags";
+
+  [building.category, distanceText(building)].forEach(text => {
+    const tag = document.createElement("span");
+    tag.className = "tag";
+    tag.textContent = text;
+    tags.appendChild(tag);
+  });
+
+  details.appendChild(tags);
+
+  const fields = [
+    ["Category", building.category],
+    ["Opening hours", building.hours],
+    ["Departments / services", building.departments.join(", ")],
+    ["History", building.history],
+    ["What's special", building.special]
+  ];
+
+  fields.forEach(([label, value]) => {
+    const p = document.createElement("p");
+    const strong = document.createElement("strong");
+    strong.textContent = label + ": ";
+    p.append(strong, document.createTextNode(value));
+    details.appendChild(p);
+  });
+
+  const button = document.createElement("button");
+  button.textContent = "Show on Map";
+  button.addEventListener("click", () => showOnMap(building.id));
+  details.appendChild(button);
+
   document.getElementById("mapMessage").textContent =
-    `Selected: ${b.name}`;
+    "Selected: " + building.name;
 }
 
-function showRoute(id) {
-  const b = buildings.find(x => x.id === id);
-  if (!b) return;
-  map.setView([b.lat, b.lng], 18);
-  markers.get(id)?.openPopup();
-  showBuilding(b);
+function showOnMap(id) {
+  const building = buildings.find(item => item.id === id);
+  if (!building) return;
+
+  map.setView([building.lat, building.lng], 18);
+
+  const marker = markers.get(id);
+  if (marker) marker.openPopup();
+
+  showBuilding(building);
 }
+
+// =====================================================
+// SEARCH AND NEARBY PLACES
+// =====================================================
 
 function renderPlaces() {
-  const term = document.getElementById("search").value.trim().toLowerCase();
+  const query = document.getElementById("search")
+    .value.trim().toLowerCase();
+
   const category = document.getElementById("category").value;
 
   const results = buildings
-    .filter(b => category === "All" || b.category === category)
-    .filter(b =>
-      `${b.name} ${b.category} ${b.departments.join(" ")}`
-        .toLowerCase().includes(term))
+    .filter(building =>
+      category === "All" || building.category === category
+    )
+    .filter(building => {
+      const searchableText = [
+        building.name,
+        building.category,
+        ...building.departments
+      ].join(" ").toLowerCase();
+
+      return searchableText.includes(query);
+    })
     .sort((a, b) => {
       if (!userLocation) return a.name.localeCompare(b.name);
+
       return distanceMeters(userLocation, a) -
              distanceMeters(userLocation, b);
     });
@@ -344,138 +495,198 @@ function renderPlaces() {
   const container = document.getElementById("places");
   container.replaceChildren();
 
-  if (!results.length) {
-    container.textContent = "No matching places found.";
+  if (results.length === 0) {
+    const message = document.createElement("p");
+    message.className = "muted";
+    message.textContent = "No matching campus places found.";
+    container.appendChild(message);
     return;
   }
 
-  results.forEach(b => {
+  results.forEach(building => {
     const item = document.createElement("div");
     item.className = "place";
 
     const title = document.createElement("h3");
-    title.textContent = b.name;
+    title.textContent = building.name;
 
-    const categoryText = document.createElement("p");
-    categoryText.textContent = b.category;
+    const type = document.createElement("p");
+    type.textContent = building.category;
 
     const distance = document.createElement("p");
-    distance.textContent = distanceText(b);
+    distance.textContent = distanceText(building);
 
     const button = document.createElement("button");
     button.className = "secondary";
-    button.textContent = "View details";
-    button.addEventListener("click", () => showRoute(b.id));
+    button.textContent = "View Details";
+    button.addEventListener("click", () => showOnMap(building.id));
 
-    item.append(title, categoryText, distance, button);
+    item.append(title, type, distance, button);
     container.appendChild(item);
   });
 }
 
-buildings.forEach(b => {
-  const marker = L.marker([b.lat, b.lng])
-    .addTo(map)
-    .bindPopup(`<b>${b.name}</b><br>${b.category}`);
+// =====================================================
+// ADD CAMPUS MARKERS
+// =====================================================
 
-  marker.on("click", () => showBuilding(b));
-  markers.set(b.id, marker);
+buildings.forEach(building => {
+  const marker = L.marker([building.lat, building.lng])
+    .addTo(map)
+    .bindPopup("");
+
+  marker.setPopupContent(
+    "<strong>" + building.name + "</strong><br>" +
+    building.category
+  );
+
+  marker.on("click", () => showBuilding(building));
+
+  markers.set(building.id, marker);
 });
 
-document.getElementById("searchBtn")
-  .addEventListener("click", renderPlaces);
-document.getElementById("search")
-  .addEventListener("input", renderPlaces);
-document.getElementById("category")
-  .addEventListener("change", renderPlaces);
+// =====================================================
+// GPS LOCATION
+// =====================================================
 
 document.getElementById("locateBtn").addEventListener("click", () => {
   if (!navigator.geolocation) {
-    alert("Geolocation is not supported by this browser.");
+    alert("Geolocation is not supported by your browser.");
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(position => {
-    userLocation = {
-      lat: position.coords.latitude,
-      lng: position.coords.longitude
-    };
+  document.getElementById("mapMessage").textContent =
+    "Finding your location...";
 
-    if (userMarker) map.removeLayer(userMarker);
+  navigator.geolocation.getCurrentPosition(
+    position => {
+      userLocation = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
 
-    userMarker = L.circleMarker(
-      [userLocation.lat, userLocation.lng],
-      { radius: 9, color: "#ffffff", fillColor: "#438bff",
-        fillOpacity: 1, weight: 3 }
-    ).addTo(map).bindPopup("Your current location");
+      if (userMarker) map.removeLayer(userMarker);
 
-    map.setView([userLocation.lat, userLocation.lng], 17);
-    document.getElementById("mapMessage").textContent =
-      "Location found. Nearby places are sorted by distance.";
-    renderPlaces();
-  }, error => {
-    const messages = {
-      1: "Location permission was denied. Allow location access in your browser.",
-      2: "Your location is currently unavailable.",
-      3: "Location request timed out."
-    };
-    alert(messages[error.code] || "Unable to get your location.");
-  }, { enableHighAccuracy: true, timeout: 10000 });
+      userMarker = L.circleMarker(
+        [userLocation.lat, userLocation.lng],
+        {
+          radius: 9,
+          color: "#ffffff",
+          fillColor: "#438bff",
+          fillOpacity: 1,
+          weight: 3
+        }
+      ).addTo(map).bindPopup("Your current location");
+
+      userMarker.openPopup();
+
+      map.setView([userLocation.lat, userLocation.lng], 17);
+
+      document.getElementById("mapMessage").textContent =
+        "Your location was found. Places are sorted by approximate distance.";
+
+      renderPlaces();
+    },
+    error => {
+      const messages = {
+        1: "Location permission denied. Allow location access in your browser.",
+        2: "Your location is unavailable. Please try again.",
+        3: "Location request timed out. Please try again."
+      };
+
+      alert(messages[error.code] || "Unable to find your location.");
+
+      document.getElementById("mapMessage").textContent =
+        "Location unavailable. You can still browse campus markers.";
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 10000
+    }
+  );
 });
 
-// SAMPLE INDOOR ROOM DATA — replace with your real floor plans.
+// =====================================================
+// SAMPLE INDOOR FLOOR PLANS
+// Replace with verified room data and real floor plans.
+// =====================================================
+
 const rooms = {
   "Ground Floor": [
-    ["Reception", "Information and visitor assistance"],
-    ["Room G01", "Add room details"],
-    ["Restrooms", "Verify accessible facilities"],
-    ["Stairs", "Floor access"],
-    ["Room G02", "Add room details"],
-    ["Exit", "Verify emergency exit location"]
+    ["Reception", "Information and visitor assistance."],
+    ["Room G01", "Add verified room information."],
+    ["Restrooms", "Verify location and accessibility."],
+    ["Stairs", "Verify staircase location."],
+    ["Room G02", "Add verified room information."],
+    ["Exit", "Verify the marked exit on site."]
   ],
+
   "First Floor": [
-    ["Room 101", "Add room details"],
-    ["Computer Lab", "Add lab details"],
-    ["Restrooms", "Verify accessible facilities"],
-    ["Stairs", "Floor access"],
-    ["Room 102", "Add room details"],
-    ["Study Area", "Add study area details"]
+    ["Room 101", "Add verified room information."],
+    ["Computer Lab", "Add verified laboratory information."],
+    ["Restrooms", "Verify location and accessibility."],
+    ["Stairs", "Verify staircase location."],
+    ["Room 102", "Add verified room information."],
+    ["Study Area", "Add verified study-area information."]
   ],
+
   "Second Floor": [
-    ["Room 201", "Add room details"],
-    ["Faculty Office", "Add office details"],
-    ["Restrooms", "Verify accessible facilities"],
-    ["Stairs", "Floor access"],
-    ["Room 202", "Add room details"],
-    ["Seminar Room", "Add seminar room details"]
+    ["Room 201", "Add verified room information."],
+    ["Faculty Office", "Add verified office information."],
+    ["Restrooms", "Verify location and accessibility."],
+    ["Stairs", "Verify staircase location."],
+    ["Room 202", "Add verified room information."],
+    ["Seminar Room", "Add verified seminar-room information."]
   ]
 };
 
 function renderFloor() {
   const floor = document.getElementById("floor").value;
   const container = document.getElementById("floorPlan");
+
   container.replaceChildren();
 
   rooms[floor].forEach(([name, info]) => {
     const button = document.createElement("button");
     button.className = "room";
     button.textContent = name;
+
     button.addEventListener("click", () => {
-      container.querySelectorAll(".room").forEach(r =>
-        r.classList.remove("active"));
+      container.querySelectorAll(".room").forEach(room => {
+        room.classList.remove("active");
+      });
+
       button.classList.add("active");
 
       document.getElementById("roomInfo").textContent =
-        `${floor} — ${name}: ${info}`;
+        floor + " — " + name + ": " + info;
     });
+
     container.appendChild(button);
   });
 
   document.getElementById("roomInfo").textContent =
-    `Showing sample rooms for ${floor}.`;
+    "Showing demo rooms for " + floor + ".";
 }
+
+// =====================================================
+// EVENT LISTENERS
+// =====================================================
+
+document.getElementById("searchBtn")
+  .addEventListener("click", renderPlaces);
+
+document.getElementById("search")
+  .addEventListener("input", renderPlaces);
+
+document.getElementById("category")
+  .addEventListener("change", renderPlaces);
 
 document.getElementById("floor")
   .addEventListener("change", renderFloor);
+
+// INITIALIZE APP
 
 renderPlaces();
 renderFloor();
