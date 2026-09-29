@@ -1,331 +1,484 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CampScout - Campus Navigation & Hostel Guide</title>
-  
-  <!-- Mapbox GL JS CSS -->
-  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
-  
-  <style>
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --text: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampScout | Your Campus, Your Guide</title>
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { display: flex; height: 100vh; overflow: hidden; background: var(--bg); color: var(--text); }
+<link rel="stylesheet"
+ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
-    /* Layout */
-    #sidebar { width: 380px; height: 100%; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 2; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
-    #map-container { flex: 1; position: relative; height: 100%; }
-    #map { width: 100%; height: 100%; }
-
-    /* Header */
-    .header { padding: 20px; border-bottom: 1px solid var(--border); }
-    .header h1 { font-size: 1.4rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-    .header p { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
-
-    /* Controls */
-    .controls { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; }
-    .btn { background: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 500; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
-    .btn:hover { background: var(--primary-dark); }
-    .btn-secondary { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
-
-    /* POI List */
-    .poi-list { flex: 1; overflow-y: auto; padding: 15px 20px; }
-    .poi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; }
-    .poi-card:hover { border-color: var(--primary); transform: translateY(-1px); }
-    .poi-title { font-weight: 600; font-size: 1rem; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-    .poi-tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; background: #e0e7ff; color: #3730a3; font-weight: 600; }
-    .poi-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; display: flex; gap: 12px; }
-
-    /* Detail Drawer Modal */
-    #detail-drawer { position: absolute; bottom: 0; left: 0; right: 0; background: var(--surface); border-top-left-radius: 16px; border-top-right-radius: 16px; padding: 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); transform: translateY(100%); transition: transform 0.3s ease-in-out; z-index: 10; max-height: 80%; overflow-y: auto; }
-    #detail-drawer.active { transform: translateY(0); }
-    .drawer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-    .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
-    .badge { display: inline-block; background: #fef3c7; color: #92400e; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; font-weight: 600; margin-bottom: 10px; }
-    
-    /* Indoor Map Modal */
-    #indoor-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; }
-    #indoor-modal.active { display: flex; }
-    .indoor-content { background: var(--surface); width: 90%; max-width: 650px; border-radius: 12px; padding: 20px; position: relative; }
-    .floor-controls { display: flex; gap: 8px; margin: 15px 0; }
-    .floor-btn { padding: 6px 12px; border: 1px solid var(--border); background: white; border-radius: 6px; cursor: pointer; }
-    .floor-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-    .blueprint-viewport { width: 100%; height: 280px; background: #0f172a; border-radius: 8px; border: 2px dashed #334155; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-family: monospace; position: relative; overflow: hidden; }
-
-    @media (max-width: 768px) {
-      body { flex-direction: column; }
-      #sidebar { width: 100%; height: 45vh; }
-      #map-container { height: 55vh; }
-    }
-  </style>
+<style>
+:root {
+  --bg: #0b1220;
+  --panel: #131e30;
+  --border: #263750;
+  --text: #edf4ff;
+  --muted: #a5b4ca;
+  --green: #22c987;
+  --blue: #438bff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+header {
+  padding: 20px;
+  background: #101a2a;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.brand { font-size: 24px; font-weight: 800; }
+.brand span { color: var(--green); }
+header p { color: var(--muted); margin: 4px 0 0; }
+main {
+  max-width: 1250px;
+  margin: auto;
+  padding: 18px;
+}
+.searchbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+input, select, button {
+  font: inherit;
+  border-radius: 9px;
+  padding: 11px;
+}
+input, select {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  min-width: 0;
+}
+#search { flex: 1; }
+button {
+  cursor: pointer;
+  border: 0;
+  background: var(--green);
+  color: #062419;
+  font-weight: 700;
+}
+button.secondary {
+  background: #263750;
+  color: white;
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+  gap: 16px;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.panel h2 {
+  font-size: 17px;
+  padding: 15px;
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+}
+#map { height: 430px; width: 100%; }
+.content { padding: 15px; }
+.muted { color: var(--muted); }
+.tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.tag {
+  background: #203a43;
+  color: #85f2c4;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+.place {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.place:last-child { border: 0; }
+.place h3 { margin: 0 0 5px; font-size: 15px; }
+.place p { margin: 4px 0; color: var(--muted); font-size: 13px; }
+.place button { margin-top: 7px; }
+.floor {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+.room {
+  min-height: 66px;
+  border: 1px solid #547394;
+  border-radius: 8px;
+  background: #1a3049;
+  color: white;
+}
+.room:hover, .room.active { background: #17664f; }
+#roomInfo {
+  margin-top: 12px;
+  padding: 12px;
+  background: #0b1728;
+  border-radius: 8px;
+  color: var(--muted);
+}
+footer {
+  text-align: center;
+  color: var(--muted);
+  padding: 20px;
+  font-size: 12px;
+}
+.leaflet-popup-content-wrapper { border-radius: 10px; }
+@media (max-width: 760px) {
+  .layout { grid-template-columns: 1fr; }
+  #map { height: 340px; }
+  main { padding: 12px; }
+}
+</style>
 </head>
+
 <body>
+<header>
+  <div>
+    <div class="brand">📍 Camp<span>Scout</span></div>
+    <p>Your Campus, Your Guide.</p>
+  </div>
+  <button id="locateBtn">◎ Find my location</button>
+</header>
 
-  <!-- Left Sidebar -->
-  <div id="sidebar">
-    <div class="header">
-      <h1>🗺️ CampScout</h1>
-      <p>Interactive Campus Navigation & Resident Guide</p>
-    </div>
-    
-    <div class="controls">
-      <button class="btn" id="btn-gps">📍 Nearby Me</button>
-      <button class="btn btn-secondary" onclick="resetView()">Reset Map</button>
-    </div>
-
-    <div class="poi-list" id="poi-list">
-      <!-- POI cards rendered dynamically -->
-    </div>
+<main>
+  <div class="searchbar">
+    <input id="search" placeholder="Search library, canteen, lab...">
+    <button id="searchBtn">Search</button>
   </div>
 
-  <!-- Map Viewport -->
-  <div id="map-container">
-    <div id="map"></div>
-
-    <!-- Location Detail Drawer -->
-    <div id="detail-drawer">
-      <div class="drawer-header">
-        <div>
-          <span class="badge" id="drawer-category">Category</span>
-          <h2 id="drawer-title">Location Name</h2>
-        </div>
-        <button class="close-btn" onclick="closeDrawer()">&times;</button>
-      </div>
-      <p id="drawer-desc" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;"></p>
-      
-      <div style="margin-bottom: 15px;">
-        <p style="font-size: 0.85rem; font-weight: 600;">✨ What's Special:</p>
-        <p id="drawer-special" style="font-size: 0.85rem; color: #334155; margin-top: 4px;"></p>
-      </div>
-
-      <div style="margin-bottom: 15px; display: flex; gap: 20px;">
-        <div>
-          <span style="font-size: 0.75rem; color: var(--text-muted);">Rating</span>
-          <p id="drawer-rating" style="font-weight: bold; color: #d97706;">★ 0.0</p>
-        </div>
-        <div>
-          <span style="font-size: 0.75rem; color: var(--text-muted);">Hours</span>
-          <p id="drawer-hours" style="font-weight: 500; font-size: 0.85rem;">-</p>
+  <div class="layout">
+    <section>
+      <div class="panel">
+        <h2>🗺️ Campus Map</h2>
+        <div id="map"></div>
+        <div class="content muted" id="mapMessage">
+          Select a marker to explore a campus location.
         </div>
       </div>
 
-      <button class="btn" style="width: 100%;" onclick="openIndoorViewer()">🗺️ View Indoor Floor Layout</button>
-    </div>
-  </div>
+      <div class="panel">
+        <h2>🏢 Building Information</h2>
+        <div class="content" id="details">
+          <h3>Welcome to CampScout</h3>
+          <p class="muted">
+            Select a building on the map or from the nearby places list.
+          </p>
+        </div>
+      </div>
+    </section>
 
-  <!-- Indoor Layout Modal -->
-  <div id="indoor-modal">
-    <div class="indoor-content">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h3 id="indoor-title">Floor Blueprint</h3>
-        <button class="close-btn" onclick="closeIndoorViewer()">&times;</button>
+    <aside>
+      <div class="panel">
+        <h2>📍 Nearby Places</h2>
+        <div class="content">
+          <label for="category">Filter by category</label>
+          <select id="category" style="width:100%; margin-top:8px">
+            <option value="All">All places</option>
+            <option value="Academic">Academic buildings</option>
+            <option value="Library">Libraries</option>
+            <option value="Canteen">Canteens</option>
+            <option value="Facility">Facilities</option>
+          </select>
+          <div id="places"></div>
+        </div>
       </div>
 
-      <div class="floor-controls">
-        <button class="floor-btn active" onclick="switchFloor('Ground Floor')">Ground</button>
-        <button class="floor-btn" onclick="switchFloor('1st Floor')">Floor 1</button>
-        <button class="floor-btn" onclick="switchFloor('2nd Floor')">Floor 2</button>
-      </div>
+      <div class="panel">
+        <h2>🧭 Indoor Floor Explorer</h2>
+        <div class="content">
+          <label for="floor">Choose floor</label>
+          <select id="floor" style="width:100%; margin-top:8px">
+            <option value="Ground Floor">Ground Floor</option>
+            <option value="First Floor">First Floor</option>
+            <option value="Second Floor">Second Floor</option>
+          </select>
 
-      <div class="blueprint-viewport" id="blueprint-display">
-        [ Ground Floor Layout: Main Entrance | Restrooms (East) | Elevator (Center) ]
-      </div>
-    </div>
-  </div>
-
-  <!-- Mapbox GL JS -->
-  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-  <script>
-    // ⚠️ Replace with your actual Mapbox Public Access Token
-    mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
-
-    // Campus Base Center (e.g., IIT Roorkee area coordinates)
-    const CAMPUS_CENTER = [77.8966, 29.8649];
-
-    // Mock Campus Dataset
-    const CAMPUS_DATA = [
-      {
-        id: '1',
-        name: 'Rajendra Bhawan (Hostel)',
-        category: 'Hostel',
-        coordinates: [77.8945, 29.8660],
-        rating: '4.5',
-        hours: '24/7 Access',
-        description: 'Primary residential hostel for senior undergraduates with integrated mess facilities.',
-        special: 'Famous for the late-night canteen and spacious quadrangle lawn.',
-        indoorLayouts: {
-          'Ground Floor': '[ Ground Floor: Mess Hall | Warden Office | Common Room | Cycle Park ]',
-          '1st Floor': '[ 1st Floor: Rooms 101-145 | Washrooms (North Wing) | Study Lounge ]',
-          '2nd Floor': '[ 2nd Floor: Rooms 201-245 | Washrooms (North Wing) | TT Table Area ]'
-        }
-      },
-      {
-        id: '2',
-        name: 'Central Library',
-        category: 'Academic',
-        coordinates: [77.8975, 29.8640],
-        rating: '4.8',
-        hours: '08:00 AM - 12:00 AM',
-        description: 'Multi-story central library with thousands of technical journals and quiet reading areas.',
-        special: 'Air-conditioned 3rd-floor reading zone with high-speed Wi-Fi and power outlets.',
-        indoorLayouts: {
-          'Ground Floor': '[ Ground Floor: Circulation Desk | Issue Counters | Digital Archival Lab ]',
-          '1st Floor': '[ 1st Floor: Stack Area (Computer Science & Electrical) | Reading Pods ]',
-          '2nd Floor': '[ 2nd Floor: Quiet Study Zone | Reference Books Section | Restrooms ]'
-        }
-      },
-      {
-        id: '3',
-        name: 'Main Building / Administrative Block',
-        category: 'Administrative',
-        coordinates: [77.8966, 29.8649],
-        rating: '4.9',
-        hours: '09:00 AM - 05:30 PM',
-        description: 'Iconic historic administrative center housing the Dean and Director offices.',
-        special: 'Beautiful heritage architecture; landmark photo spot for campus visitors.',
-        indoorLayouts: {
-          'Ground Floor': '[ Ground Floor: Academic Section | Registrar Office | Main Lawn Entrance ]',
-          '1st Floor': '[ 1st Floor: Director Office | Conference Hall A & B ]',
-          '2nd Floor': '[ 2nd Floor: Administrative Records & Archives ]'
-        }
-      }
-    ];
-
-    let selectedPoi = null;
-
-    // Initialize Mapbox Engine
-    const map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: CAMPUS_CENTER,
-      zoom: 15.5
-    });
-
-    // Add Navigation & Geolocation Controls
-    map.addControl(new mapboxgl.NavigationControl());
-    
-    const geolocateControl = new mapboxgl.GeolocateControl({
-      positionOptions: { enableHighAccuracy: true },
-      trackUserLocation: true,
-      showUserHeading: true
-    });
-    map.addControl(geolocateControl);
-
-    // Initialize Application Data
-    map.on('load', () => {
-      renderPoiList();
-      addCampusMarkers();
-    });
-
-    // Render Sidebar List
-    function renderPoiList() {
-      const listContainer = document.getElementById('poi-list');
-      listContainer.innerHTML = '';
-
-      CAMPUS_DATA.forEach(poi => {
-        const card = document.createElement('div');
-        card.className = 'poi-card';
-        card.onclick = () => selectLocation(poi);
-        card.innerHTML = `
-          <div class="poi-title">
-            ${poi.name}
-            <span class="poi-tag">${poi.category}</span>
+          <div class="floor" id="floorPlan"></div>
+          <div id="roomInfo">
+            Select a room to view its information.
           </div>
-          <div class="poi-meta">
-            <span>★ ${poi.rating}</span>
-            <span>🕒 ${poi.hours}</span>
-          </div>
-        `;
-        listContainer.appendChild(card);
-      });
-    }
+          <p class="muted" style="font-size:12px">
+            Demo floor plan. Replace the sample rooms with verified
+            campus floor-plan information.
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
 
-    // Add Markers to Mapbox Map
-    function addCampusMarkers() {
-      CAMPUS_DATA.forEach(poi => {
-        const marker = new mapboxgl.Marker({ color: '#2563eb' })
-          .setLngLat(poi.coordinates)
-          .addTo(map);
+<footer>
+  CampScout • Built to make campus exploration easier.
+  <br>Demo locations are illustrative, not verified campus data.
+</footer>
 
-        marker.getElement().addEventListener('click', () => {
-          selectLocation(poi);
-        });
-      });
-    }
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// REPLACE THESE SAMPLE COORDINATES WITH YOUR CAMPUS LOCATIONS.
+const buildings = [
+  {
+    id: 1, name: "Main Academic Block",
+    category: "Academic", lat: 28.6139, lng: 77.2090,
+    year: "Add verified year", hours: "Add opening hours",
+    departments: ["Computer Science", "Administration"],
+    history: "Add your building's history.",
+    special: "Add useful student tips."
+  },
+  {
+    id: 2, name: "Central Library",
+    category: "Library", lat: 28.6145, lng: 77.2100,
+    year: "Add verified year", hours: "Add opening hours",
+    departments: ["Library Services"],
+    history: "Add library information.",
+    special: "Add quiet study areas."
+  },
+  {
+    id: 3, name: "Campus Canteen",
+    category: "Canteen", lat: 28.6133, lng: 77.2102,
+    year: "Not specified", hours: "Confirm locally",
+    departments: ["Food Services"],
+    history: "Add canteen information.",
+    special: "Add menu and student tips."
+  },
+  {
+    id: 4, name: "Science Laboratory",
+    category: "Academic", lat: 28.6142, lng: 77.2080,
+    year: "Not specified", hours: "Confirm locally",
+    departments: ["Physics", "Chemistry"],
+    history: "Add laboratory information.",
+    special: "Add lab locations and access guidance."
+  },
+  {
+    id: 5, name: "Student Help Desk",
+    category: "Facility", lat: 28.6129, lng: 77.2088,
+    year: "Not specified", hours: "Confirm locally",
+    departments: ["Student Support"],
+    history: "Add help desk information.",
+    special: "Ask about campus services here."
+  }
+];
 
-    // Focus Selected Location
-    function selectLocation(poi) {
-      selectedPoi = poi;
+const map = L.map("map").setView([28.6139, 77.2090], 17);
 
-      map.flyTo({
-        center: poi.coordinates,
-        zoom: 17,
-        pitch: 45,
-        essential: true
-      });
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
 
-      // Populate Drawer
-      document.getElementById('drawer-title').innerText = poi.name;
-      document.getElementById('drawer-category').innerText = poi.category;
-      document.getElementById('drawer-desc').innerText = poi.description;
-      document.getElementById('drawer-special').innerText = poi.special;
-      document.getElementById('drawer-rating').innerText = `★ ${poi.rating}`;
-      document.getElementById('drawer-hours').innerText = poi.hours;
+let userLocation = null;
+let userMarker = null;
+const markers = new Map();
 
-      // Open Drawer
-      document.getElementById('detail-drawer').classList.add('active');
-    }
+function distanceMeters(a, b) {
+  const R = 6371000;
+  const rad = x => x * Math.PI / 180;
+  const dLat = rad(b.lat - a.lat);
+  const dLng = rad(b.lng - a.lng);
+  const h = Math.sin(dLat / 2) ** 2 +
+    Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) *
+    Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
 
-    // Drawer Controls
-    function closeDrawer() {
-      document.getElementById('detail-drawer').classList.remove('active');
-    }
+function distanceText(place) {
+  if (!userLocation) return "Distance unavailable";
+  const d = distanceMeters(userLocation, place);
+  return d < 1000 ? `${Math.round(d)} m away` :
+    `${(d / 1000).toFixed(2)} km away`;
+}
 
-    function resetView() {
-      closeDrawer();
-      map.flyTo({ center: CAMPUS_CENTER, zoom: 15.5, pitch: 0 });
-    }
+function showBuilding(b) {
+  document.getElementById("details").innerHTML = `
+    <h3>${b.name}</h3>
+    <div class="tags">
+      <span class="tag">${b.category}</span>
+      <span class="tag">${distanceText(b)}</span>
+    </div>
+    <p><b>Year built:</b> ${b.year}</p>
+    <p><b>Opening hours:</b> ${b.hours}</p>
+    <p><b>Departments/services:</b> ${b.departments.join(", ")}</p>
+    <p><b>History:</b> ${b.history}</p>
+    <p><b>What's special:</b> ${b.special}</p>
+    <button onclick="showRoute(${b.id})">Show on map</button>
+  `;
+  document.getElementById("mapMessage").textContent =
+    `Selected: ${b.name}`;
+}
 
-    // GPS Trigger Button
-    document.getElementById('btn-gps').addEventListener('click', () => {
-      geolocateControl.trigger();
+function showRoute(id) {
+  const b = buildings.find(x => x.id === id);
+  if (!b) return;
+  map.setView([b.lat, b.lng], 18);
+  markers.get(id)?.openPopup();
+  showBuilding(b);
+}
+
+function renderPlaces() {
+  const term = document.getElementById("search").value.trim().toLowerCase();
+  const category = document.getElementById("category").value;
+
+  const results = buildings
+    .filter(b => category === "All" || b.category === category)
+    .filter(b =>
+      `${b.name} ${b.category} ${b.departments.join(" ")}`
+        .toLowerCase().includes(term))
+    .sort((a, b) => {
+      if (!userLocation) return a.name.localeCompare(b.name);
+      return distanceMeters(userLocation, a) -
+             distanceMeters(userLocation, b);
     });
 
-    // Indoor Layout Viewer Functions
-    function openIndoorViewer() {
-      if (!selectedPoi) return;
-      document.getElementById('indoor-title').innerText = `${selectedPoi.name} - Floor Plan`;
-      switchFloor('Ground Floor');
-      document.getElementById('indoor-modal').classList.add('active');
-    }
+  const container = document.getElementById("places");
+  container.replaceChildren();
 
-    function closeIndoorViewer() {
-      document.getElementById('indoor-modal').classList.remove('active');
-    }
+  if (!results.length) {
+    container.textContent = "No matching places found.";
+    return;
+  }
 
-    function switchFloor(floorName) {
-      // Update UI buttons
-      const buttons = document.querySelectorAll('.floor-btn');
-      buttons.forEach(btn => {
-        btn.classList.toggle('active', btn.innerText.includes(floorName.replace(' Floor', '').replace('st', '').replace('nd', '')));
-      });
+  results.forEach(b => {
+    const item = document.createElement("div");
+    item.className = "place";
 
-      // Update Blueprint Text Screen
-      if (selectedPoi && selectedPoi.indoorLayouts[floorName]) {
-        document.getElementById('blueprint-display').innerText = selectedPoi.indoorLayouts[floorName];
-      }
-    }
-  </script>
+    const title = document.createElement("h3");
+    title.textContent = b.name;
+
+    const categoryText = document.createElement("p");
+    categoryText.textContent = b.category;
+
+    const distance = document.createElement("p");
+    distance.textContent = distanceText(b);
+
+    const button = document.createElement("button");
+    button.className = "secondary";
+    button.textContent = "View details";
+    button.addEventListener("click", () => showRoute(b.id));
+
+    item.append(title, categoryText, distance, button);
+    container.appendChild(item);
+  });
+}
+
+buildings.forEach(b => {
+  const marker = L.marker([b.lat, b.lng])
+    .addTo(map)
+    .bindPopup(`<b>${b.name}</b><br>${b.category}`);
+
+  marker.on("click", () => showBuilding(b));
+  markers.set(b.id, marker);
+});
+
+document.getElementById("searchBtn")
+  .addEventListener("click", renderPlaces);
+document.getElementById("search")
+  .addEventListener("input", renderPlaces);
+document.getElementById("category")
+  .addEventListener("change", renderPlaces);
+
+document.getElementById("locateBtn").addEventListener("click", () => {
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported by this browser.");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(position => {
+    userLocation = {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude
+    };
+
+    if (userMarker) map.removeLayer(userMarker);
+
+    userMarker = L.circleMarker(
+      [userLocation.lat, userLocation.lng],
+      { radius: 9, color: "#ffffff", fillColor: "#438bff",
+        fillOpacity: 1, weight: 3 }
+    ).addTo(map).bindPopup("Your current location");
+
+    map.setView([userLocation.lat, userLocation.lng], 17);
+    document.getElementById("mapMessage").textContent =
+      "Location found. Nearby places are sorted by distance.";
+    renderPlaces();
+  }, error => {
+    const messages = {
+      1: "Location permission was denied. Allow location access in your browser.",
+      2: "Your location is currently unavailable.",
+      3: "Location request timed out."
+    };
+    alert(messages[error.code] || "Unable to get your location.");
+  }, { enableHighAccuracy: true, timeout: 10000 });
+});
+
+// SAMPLE INDOOR ROOM DATA — replace with your real floor plans.
+const rooms = {
+  "Ground Floor": [
+    ["Reception", "Information and visitor assistance"],
+    ["Room G01", "Add room details"],
+    ["Restrooms", "Verify accessible facilities"],
+    ["Stairs", "Floor access"],
+    ["Room G02", "Add room details"],
+    ["Exit", "Verify emergency exit location"]
+  ],
+  "First Floor": [
+    ["Room 101", "Add room details"],
+    ["Computer Lab", "Add lab details"],
+    ["Restrooms", "Verify accessible facilities"],
+    ["Stairs", "Floor access"],
+    ["Room 102", "Add room details"],
+    ["Study Area", "Add study area details"]
+  ],
+  "Second Floor": [
+    ["Room 201", "Add room details"],
+    ["Faculty Office", "Add office details"],
+    ["Restrooms", "Verify accessible facilities"],
+    ["Stairs", "Floor access"],
+    ["Room 202", "Add room details"],
+    ["Seminar Room", "Add seminar room details"]
+  ]
+};
+
+function renderFloor() {
+  const floor = document.getElementById("floor").value;
+  const container = document.getElementById("floorPlan");
+  container.replaceChildren();
+
+  rooms[floor].forEach(([name, info]) => {
+    const button = document.createElement("button");
+    button.className = "room";
+    button.textContent = name;
+    button.addEventListener("click", () => {
+      container.querySelectorAll(".room").forEach(r =>
+        r.classList.remove("active"));
+      button.classList.add("active");
+
+      document.getElementById("roomInfo").textContent =
+        `${floor} — ${name}: ${info}`;
+    });
+    container.appendChild(button);
+  });
+
+  document.getElementById("roomInfo").textContent =
+    `Showing sample rooms for ${floor}.`;
+}
+
+document.getElementById("floor")
+  .addEventListener("change", renderFloor);
+
+renderPlaces();
+renderFloor();
+</script>
 </body>
 </html>
-     
